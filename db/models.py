@@ -55,7 +55,8 @@ class AlertModel(Base):
     location = Column(String)
     affectedArea = Column(Float)
     populationAtRisk = Column(Integer)
-    reportedMinutesAgo = Column(Integer)
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=True)
+    reportedMinutesAgo = Column(Integer, nullable=True)
     acknowledged = Column(Boolean, default=False)
 
 class ReportModel(Base):
@@ -64,7 +65,7 @@ class ReportModel(Base):
     disasterType = Column(String)
     location = Column(String)
     submittedBy = Column(String)
-    timeAgo = Column(String)
+    timeAgo = Column(DateTime, default=datetime.utcnow)
     status = Column(String)
     severity = Column(String)
 

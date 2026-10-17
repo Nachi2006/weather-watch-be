@@ -1,5 +1,5 @@
 from pydantic import BaseModel, HttpUrl, Field
-from typing import List, Optional
+from typing import List, Optional, Union
 from datetime import datetime, date
 from enum import Enum
 
@@ -41,9 +41,13 @@ class Report(BaseModel):
     disasterType: str
     location: str
     submittedBy: str
-    timeAgo: str
+    timeAgo: str  # Calculated relative time (e.g. '8 min ago', 'just now')
+    timestamp: Optional[datetime] = None  # Exact Date & Time
     status: str
     severity: str
+
+    class Config:
+        from_attributes = True
 
 class Alert(BaseModel):
     id: str
@@ -54,8 +58,13 @@ class Alert(BaseModel):
     location: str
     affectedArea: float
     populationAtRisk: int
-    reportedMinutesAgo: int
+    reportedMinutesAgo: int  # Calculated minutes elapsed
+    timestamp: Optional[datetime] = None  # Exact Date & Time
+    timeAgo: Optional[str] = None  # Calculated relative time string
     acknowledged: bool = False
+
+    class Config:
+        from_attributes = True
 
 class Disaster(BaseModel):
     id: str
@@ -71,7 +80,8 @@ class Disaster(BaseModel):
     status: str
     timestamp: datetime
     image: str
-    reportedMinutesAgo: Optional[int] = None
+    reportedMinutesAgo: Optional[int] = None  # Calculated minutes elapsed
+    timeAgo: Optional[str] = None  # Calculated relative time
     roadAccessibility: Optional[str] = None
     rainfall: Optional[str] = None
     temperature: Optional[float] = None
@@ -82,6 +92,9 @@ class Disaster(BaseModel):
     overlayImage: Optional[str] = None
     aiSummary: Optional[str] = None
     recommendations: Optional[List[str]] = None
+
+    class Config:
+        from_attributes = True
 
 class Error(BaseModel):
     detail: str
@@ -100,6 +113,7 @@ class DisasterCreate(BaseModel):
     dryArea: float = 0.0
     populationAtRisk: int = 0
     status: str = "Active"
+    timestamp: Optional[datetime] = None
     image: str = ""
     reportedMinutesAgo: Optional[int] = None
     roadAccessibility: Optional[str] = None
@@ -125,7 +139,8 @@ class AlertCreate(BaseModel):
     location: str
     affectedArea: float = 0.0
     populationAtRisk: int = 0
-    reportedMinutesAgo: int = 0
+    timestamp: Optional[datetime] = None
+    reportedMinutesAgo: Optional[int] = None
     acknowledged: bool = False
 
 class ReportCreate(BaseModel):
@@ -133,7 +148,8 @@ class ReportCreate(BaseModel):
     disasterType: str
     location: str
     submittedBy: str = "Anonymous"
-    timeAgo: str = "just now"
+    timeAgo: Optional[Union[datetime, str]] = None  # Date & Time or string, defaults to now
+    timestamp: Optional[datetime] = None
     status: str = "Pending"
     severity: str
 

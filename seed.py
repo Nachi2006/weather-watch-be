@@ -1,8 +1,9 @@
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timedelta, timezone
 from db.db import SessionLocal
 from db.models import DisasterModel, AlertModel, ReportModel, HistoryEntryModel, FacilityModel
 from services.auth import seed_default_users
+from services.time_utils import parse_datetime_flexible
 
 disasters_data = [
   {
@@ -363,7 +364,10 @@ def seed_db():
         
         for a in alerts_data:
             if not db.query(AlertModel).filter_by(id=a['id']).first():
-                db.add(AlertModel(**a))
+                a_copy = dict(a)
+                mins = a_copy.get("reportedMinutesAgo", 0)
+                a_copy["timestamp"] = datetime.utcnow() - timedelta(minutes=mins)
+                db.add(AlertModel(**a_copy))
 
         for f in facilities_data:
             if not db.query(FacilityModel).filter_by(id=f['id']).first():
@@ -371,7 +375,12 @@ def seed_db():
 
         for r in reports_data:
             if not db.query(ReportModel).filter_by(id=r['id']).first():
-                db.add(ReportModel(**r))
+                r_copy = dict(r)
+                dt = parse_datetime_flexible(r_copy["timeAgo"])
+                if dt.tzinfo is not None:
+                    dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+                r_copy["timeAgo"] = dt
+                db.add(ReportModel(**r_copy))
 
         for h in history_data:
             db_h = HistoryEntryModel(**h)
