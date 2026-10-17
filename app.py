@@ -2,9 +2,10 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
-from db.db import engine, get_db, Base
+from db.db import engine, get_db, Base, SessionLocal
 from db.models import Test
-from routers import disasters, alerts, reports, history, facilities, dashboard, ai_pipeline
+from routers import disasters, alerts, reports, history, facilities, dashboard, ai_pipeline, auth
+from services.auth import seed_default_users
 
 app = FastAPI(title="RescueAI — Disaster Response Backend", version="1.0.0")
 
@@ -18,6 +19,14 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 
+# Seed initial default users if not present
+try:
+    with SessionLocal() as db_session:
+        seed_default_users(db_session)
+except Exception as e:
+    print("Default user seeding note:", e)
+
+app.include_router(auth.router)
 app.include_router(disasters.router)
 app.include_router(alerts.router)
 app.include_router(reports.router)

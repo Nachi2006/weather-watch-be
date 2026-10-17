@@ -2,6 +2,7 @@ import json
 from datetime import datetime, date
 from db.db import SessionLocal
 from db.models import DisasterModel, AlertModel, ReportModel, HistoryEntryModel, FacilityModel
+from services.auth import seed_default_users
 
 disasters_data = [
   {
@@ -377,6 +378,8 @@ def seed_db():
             db_h.date = date.fromisoformat(h['date'])
             # Since history does not have a natural ID in the mock, we just add it
             db.add(db_h)
+
+        seed_default_users(db)
 
         db.commit()
         print("Database successfully seeded with mock data.")

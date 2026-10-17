@@ -1,6 +1,18 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Date
 from sqlalchemy.orm import relationship
+from datetime import datetime
 from db.db import Base
+
+class UserModel(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, nullable=False, default="User") 
+    full_name = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 
 class Test(Base):
     __tablename__ = "test"

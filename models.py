@@ -1,6 +1,7 @@
 from pydantic import BaseModel, HttpUrl, Field
 from typing import List, Optional
 from datetime import datetime, date
+from enum import Enum
 
 class LabelData(BaseModel):
     labels: List[str]
@@ -142,3 +143,41 @@ class FacilityCreate(BaseModel):
     type: str
     latitude: float
     longitude: float
+
+# ── Auth models ──────────────────────────────────────────────────────────────
+
+class UserRole(str, Enum):
+    ADMIN = "Admin"
+    RESCUE_TEAM = "Rescue Team"
+    USER = "User"
+
+class UserRegister(BaseModel):
+    username: str
+    email: str
+    password: str
+    role: Optional[str] = "User"
+    full_name: Optional[str] = None
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int = 900  # 15 minutes in seconds
+    role: str
+    username: str
+    email: str
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    role: str
+    full_name: Optional[str] = None
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
