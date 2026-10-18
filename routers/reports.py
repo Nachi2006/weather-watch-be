@@ -7,6 +7,10 @@ from db.models import UserModel
 from models import Report, ReportCreate
 from services import reports as report_service
 from services.security import require_rescue_team_or_admin, require_authenticated_user
+import logging
+from services.notification_service import notify_rescue_team
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
@@ -17,6 +21,7 @@ def get_reports(
 ):
     return report_service.get_all(db)
 
+
 @router.post("", response_model=Report, status_code=201)
 def create_report(
     body: ReportCreate,
@@ -24,6 +29,21 @@ def create_report(
     current_user: UserModel = Depends(require_authenticated_user)
 ):
     report_dict = body.model_dump()
-    if not report_dict.get("submittedBy") or report_dict.get("submittedBy") == "Anonymous":
-        report_dict["submittedBy"] = current_user.username
-    return report_service.create(db, report_dict)
+    report_dict["submittedBy"] = current_user.username
+
+    created_report = report_service.create(db, report_dict)
+
+    try:
+        message_id = notify_rescue_team(created_report)
+        logger.info(
+            "SNS notification published for report %s: %s",
+            created_report["id"],
+            message_id,
+        )
+    except Exception:
+        logger.exception(
+            "SNS notification failed for report %s",
+            created_report["id"],
+        )
+
+    return created_report

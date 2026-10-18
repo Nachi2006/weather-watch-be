@@ -10,9 +10,13 @@ dependencies = [
     "dotenv>=0.9.9",
     "fastapi>=0.141.1",
     "httpx>=0.28.1",
+    "joblib>=1.6.0",
+    "pandas>=3.0.6",
     "psycopg2-binary>=2.9.12",
     "pyjwt>=2.15.1",
     "python-multipart>=0.0.32",
+    "requests>=2.34.2",
+    "scikit-learn==1.6.1",
     "sqlalchemy>=2.0.52",
     "uvicorn>=0.52.4",
 ]
