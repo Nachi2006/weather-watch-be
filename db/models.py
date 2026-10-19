@@ -1,6 +1,18 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Date
 from sqlalchemy.orm import relationship
+from datetime import datetime
 from db.db import Base
+
+class UserModel(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, nullable=False, default="User") 
+    full_name = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 
 class Test(Base):
     __tablename__ = "test"
@@ -43,7 +55,8 @@ class AlertModel(Base):
     location = Column(String)
     affectedArea = Column(Float)
     populationAtRisk = Column(Integer)
-    reportedMinutesAgo = Column(Integer)
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=True)
+    reportedMinutesAgo = Column(Integer, nullable=True)
     acknowledged = Column(Boolean, default=False)
 
 class ReportModel(Base):
@@ -52,7 +65,7 @@ class ReportModel(Base):
     disasterType = Column(String)
     location = Column(String)
     submittedBy = Column(String)
-    timeAgo = Column(String)
+    timeAgo = Column(DateTime, default=datetime.utcnow)
     status = Column(String)
     severity = Column(String)
 
