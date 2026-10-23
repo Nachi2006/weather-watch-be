@@ -19,7 +19,7 @@ router = APIRouter(prefix="/reports", tags=["Reports"])
 @router.get("", response_model=List[Report])
 def get_reports(
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(require_rescue_team_or_admin)
+    current_user: UserModel = Depends(require_authenticated_user)
 ):
     return report_service.get_all(db)
 

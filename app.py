@@ -7,7 +7,7 @@ from db.models import Test
 from routers import disasters, alerts, reports, history, facilities, dashboard, ai_pipeline, auth
 from services.auth import seed_default_users
 
-app = FastAPI(title="RescueAI — Disaster Response Backend", version="1.0.0")
+app = FastAPI(title="Weather Watch — Disaster Response Backend", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
