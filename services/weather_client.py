@@ -17,6 +17,7 @@ def fetch_weather(latitude: float, longitude: float) -> dict:
             "rain",
             "relative_humidity_2m",
             "soil_moisture_0_to_7cm",
+            "surface_pressure",
         ],
         "forecast_days": 2,
         "timezone": "Asia/Kolkata",
