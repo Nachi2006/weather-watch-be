@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
-from datetime import timezone
+from datetime import timezone, datetime
 import uuid
 
 from db.models import ReportModel
 from services.time_utils import format_time_ago, parse_datetime_flexible
+
 
 def format_report(record: ReportModel) -> dict:
     return {
@@ -15,7 +16,11 @@ def format_report(record: ReportModel) -> dict:
         "timestamp": record.timeAgo,
         "status": record.status,
         "severity": record.severity,
+        "acknowledged": record.acknowledged,
+        "acknowledgedBy": record.acknowledgedBy,
+        "acknowledgedAt": record.acknowledgedAt,
     }
+
 
 def get_all(db: Session):
     records = db.query(ReportModel).all()
@@ -35,4 +40,29 @@ def create(db: Session, data: dict):
     db.add(record)
     db.commit()
     db.refresh(record)
+    return format_report(record)
+
+
+def acknowledge_report(
+    db: Session,
+    report_id: str,
+    username: str,
+):
+    record = (
+        db.query(ReportModel)
+        .filter(ReportModel.id == report_id)
+        .first()
+    )
+
+    if record is None:
+        return None
+
+    if not record.acknowledged:
+        record.acknowledged = True
+        record.acknowledgedBy = username
+        record.acknowledgedAt = datetime.utcnow()
+
+        db.commit()
+        db.refresh(record)
+
     return format_report(record)

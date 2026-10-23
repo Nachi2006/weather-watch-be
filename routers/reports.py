@@ -9,6 +9,8 @@ from services import reports as report_service
 from services.security import require_rescue_team_or_admin, require_authenticated_user
 import logging
 from services.notification_service import notify_rescue_team
+from fastapi import HTTPException
+
 
 logger = logging.getLogger(__name__)
 
@@ -47,3 +49,27 @@ def create_report(
         )
 
     return created_report
+
+
+@router.patch("/{report_id}/acknowledge")
+def acknowledge_report(
+    report_id: str,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(require_rescue_team_or_admin),
+):
+    report = report_service.acknowledge_report(
+        db=db,
+        report_id=report_id,
+        username=current_user.username,
+    )
+
+    if report is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Report not found",
+        )
+
+    return {
+        "message": "Report acknowledged successfully",
+        "report": report,
+    }
