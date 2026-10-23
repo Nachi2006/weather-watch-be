@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from datetime import datetime
+from sqlalchemy import JSON, UniqueConstraint
+from sqlalchemy.sql import func
 from db.db import Base
 
 class UserModel(Base):
@@ -68,6 +70,10 @@ class ReportModel(Base):
     timeAgo = Column(DateTime, default=datetime.utcnow)
     status = Column(String)
     severity = Column(String)
+    acknowledged = Column(Boolean, default=False, nullable=False)
+    acknowledgedBy = Column(String, nullable=True)
+    acknowledgedAt = Column(DateTime, nullable=True)
+
 
 class HistoryEntryModel(Base):
     __tablename__ = "history_entries"
@@ -86,3 +92,29 @@ class FacilityModel(Base):
     type = Column(String)
     latitude = Column(Float)
     longitude = Column(Float)
+
+
+class WeatherObservation(Base):
+    __tablename__ = "weather_observations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    source = Column(String, nullable=False, default="Open-Meteo")
+    station_id = Column(String, nullable=False)
+    station_name = Column(String, nullable=True)
+
+    observed_at = Column(DateTime(timezone=True), nullable=False)
+    fetched_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+    temperature_c = Column(Float, nullable=True)
+    rainfall_mm = Column(Float, nullable=True)
+    humidity_pct = Column(Float, nullable=True)
+    wind_speed_kmph = Column(Float, nullable=True)
+    pressure_hpa = Column(Float, nullable=True)
+
+    raw_data = Column(JSON, nullable=False)
+    record_hash = Column(String(64), nullable=False, unique=True)
