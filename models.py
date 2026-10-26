@@ -21,6 +21,25 @@ class Analytics(BaseModel):
     populationAtRisk: LabelData
     responseStatus: LabelData
 
+class WeatherReading(BaseModel):
+    location: str
+    temperature: Optional[float] = None
+    humidity: Optional[float] = None
+    rainfall: Optional[str] = None
+    waterLevel: Optional[str] = None
+    roadAccessibility: Optional[str] = None
+    severity: Optional[str] = None
+
+class TelemetryInsights(BaseModel):
+    avgTemperature: float
+    avgHumidity: float
+    highRiskRainfallCount: int
+    dangerWaterLevelCount: int
+    sensorLocationsMonitored: int
+    mostFrequentHazard: str
+    topVulnerableRegion: str
+    weatherReadings: List[WeatherReading]
+
 class Facility(BaseModel):
     id: str
     name: str

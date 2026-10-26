@@ -2,3 +2,4 @@
 __pycache__
 .env
 test_auth_system.py
+lambda_build/

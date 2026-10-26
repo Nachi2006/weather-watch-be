@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from db.db import engine, get_db, Base, SessionLocal
 from db.models import Test
-from routers import disasters, alerts, reports, history, facilities, dashboard, ai_pipeline, auth, predictions
+from routers import disasters, alerts, reports, history, facilities, dashboard, auth, predictions
 from services.auth import seed_default_users
 from services.prediction_scheduler import start_scheduler, stop_scheduler
 
@@ -62,7 +62,6 @@ app.include_router(reports.router)
 app.include_router(history.router)
 app.include_router(facilities.router)
 app.include_router(dashboard.router)
-app.include_router(ai_pipeline.router)
 app.include_router(predictions.router)
 
 @app.post("/test")
